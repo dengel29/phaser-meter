@@ -23,24 +23,58 @@ export class Meter extends Phaser.Scene {
         )
         this.fill.resize(43,30)
         
-
-    //     this.fill.events.on(NineSlice.EVENTS.UPDATE_SAFE_BOUNDS, (_, bb) => {
-    //         console.log(bb)
-    //   })
+        // let growMeter = function(){
+        //         this.tweens.add({
+        //         targets: this.fill,
+        //         duration: 600,
+        //         onStart:
+        //         pause: false,
+        //         callbackScope: this,
+        //         onComplete: function(tween, sprites) {
+        //         console.log("we have been called")
+        //         }
+        //     })
+        // }
+          
+        
 
       // take input
       var keyObj = this.input.keyboard.addKey('C');
       keyObj.on('up', event => { 
-        console.log(this.fill.width)
+        // set increment to 1/10 of meter
         let increment = this.fill.width + 43 //maxes at 430
+        
+        console.log('pressed c')
+        console.log("context")
+        console.log(this)
         if (increment > 430) {
             console.log("reached the limit")
             return
         } else {
-            this.fill.resize(increment, 30)
+            this.fillMeter()
+            
+            
         }
       });
 
+    }
+
+    fillMeter(){
+        this.tween = this.tweens.addCounter({
+            from: this.fill.width,
+            to: this.fill.width+43,
+            ease: 'Linear',       // 'Cubic', 'Elastic', 'Bounce', 'Back'
+            duration: 500,
+            callbackScope: this,
+            onUpdate: () => {
+                console.log(this.tween.getValue())
+                this.fill.resize(this.tween.getValue(), 30)
+
+            },
+            pause: false,
+            repeat: 0,            // -1: infinity
+            yoyo: false,
+        });
     }
 
     update(){}
