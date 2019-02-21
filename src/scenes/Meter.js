@@ -12,8 +12,13 @@ export class Meter extends Phaser.Scene {
     create() {
         this.startX = 400
         this.startY = 300
+
+        // empty meter
         this.meter = this.add.image(this.startX, this.startY,'meter')
+
+        // meter filling
         this.fill = this.add.nineslice(
+            // nineslice has some strange effects on position, so needed to adjust to get inside of empty meter.
             this.startX - 219, this.startY -15,
             436, 30,
             'fill',
@@ -21,49 +26,43 @@ export class Meter extends Phaser.Scene {
             5// (optional) pixels to offset when computing the safe usage area
 
         )
-        this.fill.resize(43,30)
-        
-        // let growMeter = function(){
-        //         this.tweens.add({
-        //         targets: this.fill,
-        //         duration: 600,
-        //         onStart:
-        //         pause: false,
-        //         callbackScope: this,
-        //         onComplete: function(tween, sprites) {
-        //         console.log("we have been called")
-        //         }
-        //     })
-        // }
-          
-        
 
-      // take input
-      var keyObj = this.input.keyboard.addKey('C');
+        // starting size of fill - all size updates of the meter filling happens through the resize method, which takes width and height
+        this.fill.resize(2,30)
+         
+
+      // take keyboard input to simulate cheering/donating
+      let keyObj = this.input.keyboard.addKey('C');
       keyObj.on('up', event => { 
-        // set increment to 1/10 of meter
-        let increment = this.fill.width + 43 //maxes at 430
+        // randomize amount of donation
+        let min = 30;
+        let max = 50;
+        let increment = Math.floor(Math.random()* (max - min + 1) + min) 
+
+        // get current width
+        let currentWidth = this.fill.width
+        let limit = 433 // fills up at ~433
         
-        console.log('pressed c')
-        console.log("context")
-        console.log(this)
-        if (increment > 430) {
-            console.log("reached the limit")
+        if (currentWidth >= limit) {
+            console.log("previously reached the limit")
             return
+        }
+        else if (increment + currentWidth >= limit ) {
+            let remainingInc = limit - currentWidth 
+            this.fillMeter(remainingInc)
+            console.log("reached the limit")
         } else {
-            this.fillMeter()
-            
-            
+            this.fillMeter(increment)
         }
       });
 
     }
 
-    fillMeter(){
+    fillMeter(inc){
         this.tween = this.tweens.addCounter({
             from: this.fill.width,
-            to: this.fill.width+43,
-            ease: 'Linear',       // 'Cubic', 'Elastic', 'Bounce', 'Back'
+            to: this.fill.width + inc,
+            ease: 'Linear',  
             duration: 500,
             callbackScope: this,
             onUpdate: () => {
@@ -73,7 +72,7 @@ export class Meter extends Phaser.Scene {
             },
             pause: false,
             repeat: 0,            // -1: infinity
-            yoyo: false,
+            yoyo: false
         });
     }
 
