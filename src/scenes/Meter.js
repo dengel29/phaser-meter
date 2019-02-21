@@ -6,7 +6,7 @@ export class Meter extends Phaser.Scene {
     }
     preload() {
         this.load.image("meter", 'assets/hypemeter_empty.png'); //436x30
-        this.fillImage = this.load.image("fill", 'assets/hypemeter_fill.png');
+        this.fillImage = this.load.image("fill", 'assets/hypemeter_fill.png'); //490 x 70
     }
 
     create() {
@@ -22,10 +22,25 @@ export class Meter extends Phaser.Scene {
 
         )
         this.fill.resize(43,30)
+        
 
-        this.fill.events.on(NineSlice.EVENTS.UPDATE_SAFE_BOUNDS, (_, bb) => {
-            console.log(bb)
-      })
+    //     this.fill.events.on(NineSlice.EVENTS.UPDATE_SAFE_BOUNDS, (_, bb) => {
+    //         console.log(bb)
+    //   })
+
+      // take input
+      var keyObj = this.input.keyboard.addKey('C');
+      keyObj.on('up', event => { 
+        console.log(this.fill.width)
+        let increment = this.fill.width + 43 //maxes at 430
+        if (increment > 430) {
+            console.log("reached the limit")
+            return
+        } else {
+            this.fill.resize(increment, 30)
+        }
+      });
+
     }
 
     update(){}
