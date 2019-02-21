@@ -17,10 +17,15 @@ export class Meter extends Phaser.Scene {
             this.startX - 219, this.startY -15,
             436, 30,
             'fill',
-            10, // the width and height to offset for a corner slice
-            0// (optional) pixels to offset when computing the safe usage area
+            15, // the width and height to offset for a corner slice
+            5// (optional) pixels to offset when computing the safe usage area
 
         )
+        this.fill.resize(43,30)
+
+        this.fill.events.on(NineSlice.EVENTS.UPDATE_SAFE_BOUNDS, (_, bb) => {
+            console.log(bb)
+      })
     }
 
     update(){}
