@@ -10,9 +10,15 @@ export class Meter extends Phaser.Scene {
     }
 
     create() {
-        this.text = this.add.text(0,0,"Welcome to Example 2", { font: '40px'})
+        
         this.meter = this.add.image(400,300,'meter')
-        this.fill = this.add.image(400,300,'fill')
+        this.fill = this.add.nineslice(
+            400, 300,
+            30, 30,
+            'fill',
+      [35, 15, 15])
+
+
     }
 
     update(){}
