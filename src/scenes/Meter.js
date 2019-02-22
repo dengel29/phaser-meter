@@ -6,6 +6,10 @@ export class Meter extends Phaser.Scene {
     }
     
     preload() {
+        // simulate the streamer's goal
+        this.goal = 100;
+        
+        // load the assets 
         this.load.image("emptymeter", 'assets/hypemeter_empty.png'); //436x30
         this.fill = this.load.image("fill", 'assets/hypemeter_fill.png'); //490 x 70
 
@@ -22,32 +26,36 @@ export class Meter extends Phaser.Scene {
             },
             channels: [ "#shroud", "#esamarathon", ]
         };
-        ///// UNCOMMENT THIS CODE TO LISTEN TO TWITCH CHANNELS
-        // let client = new tmi.client(options);
-        // // start listening
-        // client.connect();
 
-        // // listens above selected channels for cheers,sends bits to meter incrementing function
-        // client.on("cheer", (channel, userstate, message) => {
-        //     let bits = parseInt(userstate.bits, 10) 
-        //     console.log(`${userstate.username} just donated ${bits} bits to ${channel}!` )   
+        ///// UNCOMMENT THESE LINES TO LISTEN TO TWITCH CHANNELS
+        /*
+        let client = new tmi.client(options);
+        // start listening
+        client.connect();
 
-        //     // send bits to meter checking function
-        //     this.meterCheck(bits)
+        // listens above selected channels for cheers,sends bits to meter incrementing function
+        client.on("cheer", (channel, userstate, message) => {
+            let bits = parseInt(userstate.bits, 10) 
+            console.log(`${userstate.username} just donated ${bits} bits to ${channel}!` )   
+
+            // send bits to meter checking function
+            this.meterCheck(bits)
             
-        // });
-
+        });
+        */
+       
+        // Using spacebar to simulate cheers for debug
         var spaceBar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
 
         spaceBar.on('up', e => {
-            this.meterCheck(200)
+            this.meterCheck(10)
         })
     }
 
     create() {
         // set a standard starting coord for images
-        this.startX = 400
-        this.startY = 300
+        this.startX = 400;
+        this.startY = 300;
 
         // increment this each time the meter is filled
         this.timesFilled = 0;
@@ -78,33 +86,36 @@ export class Meter extends Phaser.Scene {
     }
 
     meterCheck(bits) {
-        // store + display total number of bits
-        this.totalBits += bits;
-        this.updateBitsDisplay(this.totalBits);
-
         // get current width
         let currentWidth = this.fill.width
-        let limit = 433 // fills up at ~433
+        let goal = this.goal
+        const limit = 433 
+        let incrementSize = (limit/goal) * bits
         
         if (currentWidth >= limit) {
             console.log("previously reached the limit")
             // increment + display number of times filled up
-            this.timesFilled += 1
-            this.updateMultiplier(this.timesFilled)
-             
             // empty meter
             this.resetFillSize();
-            
+            this.meterCheck(bits)
             return
         }
-        else if (bits + currentWidth >= limit ) {
+        else if (incrementSize + currentWidth >= limit ) {
             let remainingInc = limit - currentWidth 
-            this.fillMeter(remainingInc)
 
+            this.fillMeter(remainingInc)
+            this.timesFilled += 1
+            this.updateMultiplier(this.timesFilled)
+            // store + display total number of bits
+            this.totalBits += bits;
+            this.updateBitsDisplay(this.totalBits);
             
-            console.log("reached the limit")
+            console.log("Goal Reached!!!!")
         } else {
-            this.fillMeter(bits)
+            this.fillMeter(incrementSize)
+            // store + display total number of bits
+            this.totalBits += bits;
+            this.updateBitsDisplay(this.totalBits);
         }
     }
 
@@ -128,7 +139,7 @@ export class Meter extends Phaser.Scene {
 
             },
             pause: false,
-            repeat: 0,            // -1: infinity
+            repeat: 0,
             yoyo: false
         });
     }
