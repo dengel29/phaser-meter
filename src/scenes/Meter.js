@@ -8,7 +8,7 @@ export class Meter extends Phaser.Scene {
     preload() {
         // simulate the streamer's goal
         this.goal = 100;
-        
+        this.uiBlocked = false;
         // load the assets 
         this.load.image("emptymeter", 'assets/hypemeter_empty.png'); //436x30
         this.fill = this.load.image("fill", 'assets/hypemeter_fill.png'); //490 x 70
@@ -48,6 +48,7 @@ export class Meter extends Phaser.Scene {
         var spaceBar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
 
         spaceBar.on('up', e => {
+            if (this.uiBlocked === true) return
             this.meterCheck(10)
         })
     }
@@ -127,6 +128,7 @@ export class Meter extends Phaser.Scene {
     }
 
     fillMeter(inc){
+        this.uiBlocked = true
         this.tween = this.tweens.addCounter({
             from: this.fill.width,
             to: this.fill.width + inc,
@@ -134,9 +136,12 @@ export class Meter extends Phaser.Scene {
             duration: 500,
             callbackScope: this,
             onUpdate: () => {
+                
                 console.log(this.tween.getValue())
                 this.fill.resize(this.tween.getValue(), 30)
-
+            },
+            onComplete: () =>{
+                this.uiBlocked = false
             },
             pause: false,
             repeat: 0,
